@@ -1,0 +1,116 @@
+@startuml
+!theme plain
+
+entity "Usuario" as usuario {
+  *id_usuario : int <<PK>>
+  nombre : varchar
+  apellido : varchar
+  correo : varchar
+  contraseña : varchar
+  rol : varchar  // paciente / medico / cuidador
+  fecha_registro : datetime
+}
+
+entity "Paciente" as paciente {
+  *id_paciente : int <<PK>>
+  id_usuario : int <<FK>>
+}
+
+entity "Medico" as medico {
+  *id_medico : int <<PK>>
+  id_usuario : int <<FK>>
+  especialidad : varchar
+}
+
+entity "Cuidador" as cuidador {
+  *id_cuidador : int <<PK>>
+  id_usuario : int <<FK>>
+}
+
+entity "Paciente_Cuidador" as pc {
+  *id_relacion : int <<PK>>
+  id_paciente : int <<FK>>
+  id_cuidador : int <<FK>>
+}
+
+entity "Receta_Medica" as receta {
+  *id_receta : int <<PK>>
+  id_medico : int <<FK>>
+  id_paciente : int <<FK>>
+  fecha_emision : date
+  descripcion : text
+}
+
+entity "Medicamento" as medicamento {
+  *id_medicamento : int <<PK>>
+  id_receta : int <<FK>>
+  nombre : varchar
+  dosis : varchar
+  frecuencia : varchar
+  duracion_dias : int
+}
+
+entity "Horario_Medicacion" as horario {
+  *id_horario : int <<PK>>
+  id_medicamento : int <<FK>>
+  hora : time
+  frecuencia : varchar
+  estado : varchar // activo / inactivo
+}
+
+entity "Adherencia" as adherencia {
+  *id_adherencia : int <<PK>>
+  id_horario : int <<FK>>
+  fecha_hora : datetime
+  estado : varchar // tomado / omitido / pospuesto
+}
+
+entity "Indicador_Salud" as indicador {
+  *id_indicador : int <<PK>>
+  id_paciente : int <<FK>>
+  tipo : varchar // glucosa, presión, peso...
+  valor : float
+  fecha_registro : datetime
+}
+
+entity "Mensaje_Chat" as chat {
+  *id_mensaje : int <<PK>>
+  id_paciente : int <<FK>>
+  id_medico : int <<FK>>
+  mensaje : text
+  fecha_envio : datetime
+  enviado_por : varchar // paciente/medico
+}
+
+entity "Historial_PDF" as historial {
+  *id_historial : int <<PK>>
+  id_paciente : int <<FK>>
+  url_documento : varchar
+  fecha_generado : datetime
+}
+
+' Relaciones
+
+usuario ||--|| paciente : "1 a 1"
+usuario ||--|| medico : "1 a 1"
+usuario ||--|| cuidador : "1 a 1"
+
+paciente ||--o{ pc : "1 a N"
+cuidador ||--o{ pc : "1 a N"
+
+medico ||--o{ receta : "1 a N"
+paciente ||--o{ receta : "1 a N"
+
+receta ||--o{ medicamento : "1 a N"
+medicamento ||--o{ horario : "1 a N"
+
+horario ||--o{ adherencia : "1 a N"
+
+paciente ||--o{ indicador : "1 a N"
+
+paciente ||--o{ chat : "1 a N"
+medico ||--o{ chat : "1 a N"
+
+paciente ||--o{ historial : "1 a N"
+
+@enduml

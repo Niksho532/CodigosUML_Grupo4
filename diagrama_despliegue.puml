@@ -1,0 +1,64 @@
+@startuml
+
+
+scale 3
+skinparam dpi 350
+
+skinparam defaultFontSize 28
+skinparam nodeFontSize 28
+skinparam classFontSize 28
+skinparam titleFontSize 34
+
+skinparam maxWidth 4000
+skinparam maxHeight 4000
+
+skinparam shadowing false
+skinparam roundCorner 20
+skinparam linetype polyline
+
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #000000
+skinparam BorderColor #000000
+
+title Diagrama de Despliegue - Plataforma HAMPI
+
+node "Microsoft Azure\n(Nube)" {
+
+  node "Servidor Backend\n(Node.js - API REST)" as backend {
+    component "Módulo de Autenticación\n(JWT)" as auth
+    component "Gestión de Usuarios"
+    component "Gestión de Recetas Médicas"
+    component "Recordatorios de Medicación"
+    component "Calendario Integral de Salud"
+  }
+
+  node "Base de Datos SQL Server" as db {
+    database "Usuarios"
+    database "Recetas"
+    database "Horarios"
+    database "Historial de Notificaciones"
+  }
+
+  node "FCM\n(Firebase Cloud Messaging)" as fcm {
+    artifact "Envio de Notificaciones Push"
+  }
+
+}
+
+node "Dispositivo del Paciente\n(Android / iOS)" as paciente {
+  component "App HAMPI Paciente\n(Flutter / React Native)"
+}
+
+node "Dispositivo del Médico\n(Android / iOS)" as medico {
+  component "App HAMPI Médico\n(Flutter / React Native)"
+}
+
+' --- Relaciones ---
+paciente --> backend : Solicitudes API\n(login, recetas, horarios)
+medico --> backend : Solicitudes API\n(gestión de pacientes y tratamientos)
+
+backend --> db : CRUD SQL
+backend --> fcm : Enviar notificaciones\n(push de medicación)
+fcm --> paciente : Recepción de alertas\nde recordatorio
+
+@enduml

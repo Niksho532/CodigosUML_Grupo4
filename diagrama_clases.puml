@@ -1,0 +1,139 @@
+@startuml
+!theme plain
+
+
+
+class Usuario {
+  -id_usuario : int
+  -nombre : string
+  -apellido : string
+  -correo : string
+  -contraseña : string
+  -rol : string
+  +registrar()
+  +autenticar()
+}
+
+class Paciente {
+  -id_paciente : int
+  -id_usuario : int
+  +verIndicadores()
+  +verRecetas()
+}
+
+class Medico {
+  -id_medico : int
+  -id_usuario : int
+  -especialidad : string
+  +emitirReceta()
+  +verPacientes()
+}
+
+class Cuidador {
+  -id_cuidador : int
+  -id_usuario : int
+  +verPaciente()
+}
+
+class RelacionCuidador {
+  -id_relacion : int
+  -id_paciente : int
+  -id_cuidador : int
+}
+
+
+
+class RecetaMedica {
+  -id_receta : int
+  -id_medico : int
+  -id_paciente : int
+  -fecha_emision : date
+  -descripcion : string
+  +agregarMedicamento()
+}
+
+class Medicamento {
+  -id_medicamento : int
+  -id_receta : int
+  -nombre : string
+  -dosis : string
+  -frecuencia : string
+  -duracion_dias : int
+  +programarHorarios()
+}
+
+class HorarioMedicacion {
+  -id_horario : int
+  -id_medicamento : int
+  -hora : time
+  -frecuencia : string
+  -estado : string
+  +generarRecordatorio()
+}
+
+class Adherencia {
+  -id_adherencia : int
+  -id_horario : int
+  -fecha_hora : datetime
+  -estado : string
+  +registrarRespuesta()
+}
+
+
+
+class IndicadorSalud {
+  -id_indicador : int
+  -id_paciente : int
+  -tipo : string
+  -valor : float
+  -fecha_registro : datetime
+  +registrar()
+}
+
+
+
+class MensajeChat {
+  -id_mensaje : int
+  -id_paciente : int
+  -id_medico : int
+  -mensaje : string
+  -fecha_envio : datetime
+  -enviado_por : string
+  +enviar()
+}
+
+
+
+class HistorialPDF {
+  -id_historial : int
+  -id_paciente : int
+  -url_documento : string
+  -fecha_generado : datetime
+  +generarPDF()
+}
+
+
+' Relaciones entre clases
+
+Usuario <|-- Paciente
+Usuario <|-- Medico
+Usuario <|-- Cuidador
+
+Paciente "1" -- "0..*" RecetaMedica
+Medico   "1" -- "0..*" RecetaMedica
+
+RecetaMedica "1" -- "1..*" Medicamento
+Medicamento  "1" -- "1..*" HorarioMedicacion
+HorarioMedicacion "1" -- "0..*" Adherencia
+
+Paciente "1" -- "0..*" IndicadorSalud
+
+Paciente "1" -- "0..*" MensajeChat
+Medico   "1" -- "0..*" MensajeChat
+
+Paciente "1" -- "0..*" HistorialPDF
+
+Paciente "1" -- "0..*" RelacionCuidador
+Cuidador "1" -- "0..*" RelacionCuidador
+
+@enduml
