@@ -1,0 +1,44 @@
+@startuml "Secuencia - Chat Médico"
+autonumber
+
+actor Paciente
+boundary "Pantalla\nChat" as UI
+control "Controlador\nChat" as Controller
+control "Servicio\nChat" as Service
+database "Repositorio\nMensajes" as Repo
+entity "Entidad\nMensaje" as Msg
+actor Medico
+
+Paciente -> UI : enviarMensaje(texto)
+activate UI
+
+UI -> Controller : postMensaje(texto, idDestinatario)
+activate Controller
+
+Controller -> Service : enviar(texto, remitente, destinatario)
+activate Service
+
+Service -> Msg : nuevo(texto, fecha)
+activate Msg
+Msg --> Service : objeto mensaje creado
+deactivate Msg
+
+Service -> Repo : guardar(mensaje)
+activate Repo
+Repo --> Service : guardado ok
+deactivate Repo
+
+Service -> Medico : notificarPush(mensaje)
+activate Medico
+Medico --> Service : recibido
+deactivate Medico
+
+Service --> Controller : Mensaje Enviado
+deactivate Service
+
+Controller --> UI : Confirmación (Doble Check)
+deactivate Controller
+
+UI --> Paciente : Actualizar Vista Chat
+deactivate UI
+@enduml

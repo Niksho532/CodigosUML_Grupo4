@@ -1,0 +1,45 @@
+@startuml "Secuencia - Crear Recordatorio"
+autonumber
+
+actor Paciente
+boundary "Pantalla\nRecordatorio" as UI
+control "Controlador\nRecordatorios" as Controller
+control "Servicio\nRecordatorios" as Service
+database "Repositorio\nRecordatorios" as Repo
+entity "Entidad\nRecordatorio" as Entity
+
+Paciente -> UI : crearRecordatorio(datos)
+activate UI
+
+UI -> Controller : guardar(datos)
+activate Controller
+
+Controller -> Service : registrarNuevo(datos)
+activate Service
+
+Service -> Service : validarDatos(datos)
+
+alt Datos Inválidos
+    Service --> Controller : Error: Datos incompletos
+else Datos Válidos
+    Service -> Entity : nuevo(datos)
+    activate Entity
+    Entity --> Service : instancia creada
+    deactivate Entity
+
+    Service -> Repo : guardar(recordatorio)
+    activate Repo
+    Repo --> Service : confirmación
+    deactivate Repo
+
+    Service --> Controller : Éxito: Guardado correctamente
+end
+
+deactivate Service
+
+Controller --> UI : Confirmación de Registro
+deactivate Controller
+
+UI --> Paciente : Mostrar Mensaje de Éxito
+deactivate UI
+@enduml

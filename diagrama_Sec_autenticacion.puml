@@ -1,0 +1,47 @@
+@startuml "Secuencia - Inicio de Sesion"
+autonumber
+
+actor Usuario
+boundary "Pantalla\nInicio Sesión" as UI
+control "Controlador\nAutenticación" as Controller
+control "Servicio\nAutenticación" as Service
+database "Repositorio\nUsuarios" as Repo
+entity "Entidad\nUsuario" as User
+
+Usuario -> UI : iniciarSesion(correo, contraseña)
+activate UI
+
+UI -> Controller : solicitarLogin(correo, contraseña)
+activate Controller
+
+Controller -> Service : autenticar(correo, contraseña)
+activate Service
+
+Service -> Repo : buscarPorCorreo(correo)
+activate Repo
+Repo --> Service : UsuarioEncontrado | nulo
+deactivate Repo
+
+alt Usuario No Existe
+    Service --> Controller : Error: Usuario no registrado
+else Usuario Existe
+    Service -> User : verificarContraseña(contraseña)
+    activate User
+    User --> Service : valida | invalida
+    deactivate User
+    
+    alt Contraseña Inválida
+        Service --> Controller : Error: Credenciales incorrectas
+    else Contraseña Válida
+        Service --> Controller : Éxito (Token Acceso)
+    end
+end
+
+deactivate Service
+
+Controller --> UI : Respuesta de Autenticación
+deactivate Controller
+
+UI --> Usuario : Mostrar Menú Principal o Error
+deactivate UI
+@enduml
